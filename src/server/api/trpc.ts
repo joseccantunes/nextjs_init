@@ -7,13 +7,12 @@
  * need to use are documented accordingly near the end.
  */
 
-import { initTRPC, TRPCError } from "@trpc/server";
-import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
+import { initTRPC, TRPCError} from "@trpc/server";
 import { type Session } from "next-auth";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
-import { getServerAuthSession } from "@/server/auth";
+import { getAuthSession } from "@/server/auth";
 import { db } from "@/server/db";
 
 /**
@@ -51,15 +50,12 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
  *
  * @see https://trpc.io/docs/context
  */
-export const createTRPCContext = async (opts: CreateNextContextOptions) => {
-  const { req, res } = opts;
 
+export const createTRPCContext = async () => {
   // Get the session from the server using the getServerSession wrapper function
-  const session = await getServerAuthSession({ req, res });
-
-  return createInnerTRPCContext({
-    session,
-  });
+  const session = await getAuthSession();
+  const contextInner = createInnerTRPCContext({ session });
+  return { ...contextInner };
 };
 
 /**
@@ -69,7 +65,7 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
  * ZodErrors so that you get typesafety on the frontend if your procedure fails due to validation
  * errors on the backend.
  */
-/*
+
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
   errorFormatter({ shape, error }) {
@@ -82,9 +78,8 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
       },
     };
   },
-});*/
+});
 
-const t = initTRPC.create();
 
 /**
  * 3. ROUTER & PROCEDURE (THE IMPORTANT BIT)
@@ -110,7 +105,7 @@ export const createTRPCRouter = t.router;
 export const publicProcedure = t.procedure;
 
 /** Reusable middleware that enforces users are logged in before running the procedure. */
-/*const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
+const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
   if (!ctx.session?.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
@@ -120,28 +115,24 @@ export const publicProcedure = t.procedure;
       session: { ...ctx.session, user: ctx.session.user },
     },
   });
-});*/
-const enforceUserIsAuthed = t.middleware(async (opts) => {
-  console.log(opts);
-  return opts.next({
-    ctx: {},
-  });
-  /*const session = await getAuthSession();
-  if (!session?.user.id) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
+});
+/*
+const isAuthed = t.middleware(({ next, ctx }) => {
+  console.log(ctx);
+  if (!ctx.session?.user?.email) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+    });
   }
-
-  let userId = session?.user.id;
-  let userSettings = session?.userSettings;
-
-  return opts.next({
+  return next({
     ctx: {
-      userId,
-      userSettings,
+      // Infers the `session` as non-nullable
+      session: ctx.session,
     },
-  });*/
+  });
 });
 
+*/
 /**
  * Protected (authenticated) procedure
  *
