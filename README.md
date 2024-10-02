@@ -7,3 +7,6 @@ This was created from [T3 Stack](https://create.t3.gg/) and I've added a few per
 - [NextAuth.js](https://next-auth.js.org)
 - [Prisma](https://prisma.io)
 - [Tailwind CSS](https://tailwindcss.com)
+
+> npm install
+> npm run dev
