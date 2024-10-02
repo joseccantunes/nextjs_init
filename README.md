@@ -9,4 +9,5 @@ This was created from [T3 Stack](https://create.t3.gg/) and I've added a few per
 - [Tailwind CSS](https://tailwindcss.com)
 
 > npm install
+
 > npm run dev
