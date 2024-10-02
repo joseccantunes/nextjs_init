@@ -8,6 +8,11 @@ This was created from [T3 Stack](https://create.t3.gg/) and I've added a few per
 - [Prisma](https://prisma.io)
 - [Tailwind CSS](https://tailwindcss.com)
 
-> npm install
+# Run
 
-> npm run dev
+```sh
+npm install
+```
+```sh
+npm run dev
+```
